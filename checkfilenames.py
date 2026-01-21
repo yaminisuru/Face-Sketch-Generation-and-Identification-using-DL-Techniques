@@ -18,7 +18,7 @@ print("Total sketches:", len(sketch_files))
 if not missing_sketches and not missing_photos:
     print(" All photo and sketch filenames are perfectly matched!")
 else:
-    print("\n Mismatched files found:\n")
+    print("Mismatched files found:")
 
     if missing_sketches:
         print("Photos without sketches:")
@@ -26,6 +26,6 @@ else:
             print("  ", f)
 
     if missing_photos:
-        print("\nSketches without photos:")
+        print("Sketches without photos:")
         for f in sorted(missing_photos):
             print("  ", f)

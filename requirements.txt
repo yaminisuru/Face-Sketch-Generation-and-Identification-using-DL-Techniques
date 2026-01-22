@@ -1,5 +1,8 @@
 torch
 torchvision
 numpy
-pillow
 opencv-python
+pillow
+scikit-learn
+matplotlib
+tqdm

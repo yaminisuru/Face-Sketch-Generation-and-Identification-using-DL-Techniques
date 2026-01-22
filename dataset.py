@@ -1,50 +1,60 @@
+# dataset.py
 import os
 import random
 from PIL import Image
 from torch.utils.data import Dataset
-import torchvision.transforms as transforms
+import torchvision.transforms as T
 
-class CUFSSketchPhotoDataset(Dataset):
-    def __init__(self, base_path):
-        self.photo_dir = os.path.join(base_path, "photos")
-        self.sketch_dir = os.path.join(base_path, "sketches")
-        self.aug_dir = os.path.join(base_path, "aug_sketches")
+class TripletDataset(Dataset):
+    def __init__(self, root, mode="train"):
+        self.sketch_dir = os.path.join(root, "sketches")
+        self.photo_dir = os.path.join(root, "photos")
 
-        self.ids = os.listdir(self.sketch_dir)
-        self.augmented = os.listdir(self.aug_dir)
+        self.sketches = sorted(os.listdir(self.sketch_dir))
+        self.photos = sorted(os.listdir(self.photo_dir))
 
-        self.transform = transforms.Compose([
-            transforms.Resize((224,224)),
-            transforms.ToTensor(),
-            transforms.Normalize([0.5]*3, [0.5]*3)
+        # Split into train/test
+        split_idx = int(0.8 * len(self.sketches))
+        if mode == "train":
+            self.sketches = self.sketches[:split_idx]
+        else:
+            self.sketches = self.sketches[split_idx:]
+
+        # Transforms
+        self.sketch_transform = T.Compose([
+            T.Resize((224, 224)),
+            T.RandomRotation(10),
+            T.RandomHorizontalFlip(),
+            T.ToTensor(),
+            T.Normalize(mean=[0.5]*3, std=[0.5]*3)
+        ])
+        self.photo_transform = T.Compose([
+            T.Resize((224, 224)),
+            T.ColorJitter(0.1,0.1,0.1,0.1),
+            T.RandomHorizontalFlip(),
+            T.ToTensor(),
+            T.Normalize(mean=[0.5]*3, std=[0.5]*3)
         ])
 
     def __len__(self):
-        return len(self.ids) * 2
+        return len(self.sketches)
 
     def __getitem__(self, idx):
-        same = idx % 2
-        base_id = self.ids[idx // 2]
+        anchor_name = self.sketches[idx]
 
-        # randomly choose original or augmented sketch
-        if random.random() < 0.5:
-            sketch_path = os.path.join(self.sketch_dir, base_id)
-        else:
-            aug = random.choice(self.augmented)
-            sketch_path = os.path.join(self.aug_dir, aug)
+        # Anchor sketch
+        anchor = Image.open(os.path.join(self.sketch_dir, anchor_name)).convert("RGB")
+        anchor = self.sketch_transform(anchor)
 
-        sketch = Image.open(sketch_path).convert("RGB")
+        # Positive photo
+        positive = Image.open(os.path.join(self.photo_dir, anchor_name)).convert("RGB")
+        positive = self.photo_transform(positive)
 
-        if same:
-            photo = Image.open(os.path.join(self.photo_dir, base_id)).convert("RGB")
-            label = 1
-        else:
-            neg_id = random.choice([x for x in self.ids if x != base_id])
-            photo = Image.open(os.path.join(self.photo_dir, neg_id)).convert("RGB")
-            label = 0
+        # Negative photo (random for initial batch)
+        neg_name = random.choice(self.photos)
+        while neg_name == anchor_name:
+            neg_name = random.choice(self.photos)
+        negative = Image.open(os.path.join(self.photo_dir, neg_name)).convert("RGB")
+        negative = self.photo_transform(negative)
 
-        return (
-            self.transform(sketch),
-            self.transform(photo),
-            label
-        )
+        return anchor, positive, negative

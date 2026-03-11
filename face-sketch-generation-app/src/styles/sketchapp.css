@@ -1,0 +1,109 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+.app-container {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* LEFT SIDEBAR */
+.sidebar {
+  width: 120px;
+  background-color: #1f4a6b;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 20px;
+}
+
+.sidebar-item {
+  margin: 20px 0;
+  text-align: center;
+  cursor: pointer;
+}
+
+.icon-circle {
+  width: 40px;
+  height: 40px;
+  background: white;
+  border-radius: 50%;
+  margin: 0 auto 5px auto;
+}
+
+/* CENTER CANVAS */
+.canvas-area {
+  flex: 1;
+  background-color: #e5e5e5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.canvas-box {
+  width: 500px;
+  height: 500px;
+  background: white;
+}
+
+/* RIGHT PANEL */
+.right-panel {
+  width: 400px;
+  background-color: #1f4a6b;
+  color: white;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* TOP BUTTONS */
+.top-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.top-buttons button {
+  background: transparent;
+  border: 2px solid white;
+  color: white;
+  padding: 8px 15px;
+  cursor: pointer;
+}
+
+/* SECTION HEADER */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.delete-btn {
+  background: transparent;
+  border: 1px solid white;
+  color: white;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+/* IMAGE GRID */
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+}
+
+.thumb {
+  background: white;
+  padding: 5px;
+}
+
+.thumb img {
+  width: 100%;
+  height: auto;
+}
